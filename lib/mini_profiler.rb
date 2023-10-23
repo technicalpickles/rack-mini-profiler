@@ -3,6 +3,7 @@
 require 'cgi'
 require 'json'
 require 'erb'
+require 'forwardable'
 
 require 'mini_profiler/class_methods'
 require 'mini_profiler/timer_struct'
@@ -17,8 +18,8 @@ require 'mini_profiler/snapshots_transporter'
 module Rack
   class MiniProfiler
     extend ClassMethods
+    def_delgators self, :current, :current=
 
-    #
     # options:
     # :auto_inject - should script be automatically injected on every html page (not xhr)
     def initialize(app, config = nil)
@@ -98,14 +99,6 @@ module Rack
 
       rack_file = Rack::File.new(MiniProfiler.resources_root, 'Cache-Control' => "max-age=#{cache_control_value}")
       rack_file.call(resources_env)
-    end
-
-    def current
-      MiniProfiler.current
-    end
-
-    def current=(c)
-      MiniProfiler.current = c
     end
 
     def config
